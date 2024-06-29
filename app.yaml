@@ -1,0 +1,83 @@
+version: everai/v1alpha1
+kind: App
+metadata:
+  name: get-start-manifest                          # application name
+spec:
+  routePath: ""                                   # optional field, default same with app name
+  image: quay.io/mc_jones/test-start-manifest:v0.0.3       # image for serverless app
+  volumeMounts:
+    - name: get-start-volume                                    # name
+      mountPath: /workspace/volume       # mount path in container
+      readOnly: true                              # only support `readOnly = true` currently, default is true
+    - name: test-start-volume                                    # name
+      mountPath: /workspace/volume-test       # mount path in container
+      readOnly: true                              # only support `readOnly = true` currently, default is true
+
+  port: 8866                                        # just one port cloud be set, everai will pass any http request /**
+                                                  # to this port, default is 80
+  readinessProbe:                                 # if readinessProbe is set up, there are no any request be route
+                                                  # to this worker before probe status is ready ( status code = 200 ),
+                                                  # otherwise (readinessProbe is not set up), everai will route reqeust
+                                                  # to this worker when container is ready,
+                                                  # even model not loaded into memory of gpu
+    httpGet:                                      # http get and post probe is the only supported methods now
+      path: /healthy-check                     # only http status 200 means ready
+
+  volumes:                                        # optional field, but very important for AI app
+    - name: get-start-volume                                    # volume name
+      volume: 
+        volume: get-start-volume          # use a private volume or a public volume from other user
+    - name: test-start-volume                                    # volume name
+      volume:
+        volume: test-start-volume          # use a a private volume or a public volume from other user
+    - name: get-start-configmap
+      configMap:
+        name: get-start-configmap
+
+  resource:
+    cpu: 1
+    memory: 1 GiB
+    
+  autoscaler:
+    scheduler: queue
+    builtin:
+      name: simple
+      arguments:
+        max_idle_time:
+          valueFrom:
+            configMapKeyRef:
+              name: get-start-configmap
+              key: max_idle_time
+        max_queue_size:
+          valueFrom:
+            configMapKeyRef:
+              name: get-start-configmap
+              key: max_queue_size
+        max_workers:
+          valueFrom:
+            configMapKeyRef:
+              name: get-start-configmap
+              key: max_workers
+        min_workers:
+          valueFrom:
+            configMapKeyRef:
+              name: get-start-configmap
+              key: min_workers
+        scale_up_step:
+          valueFrom:
+            configMapKeyRef:
+              name: get-start-configmap
+              key: scale_up_step
+      decorators:
+        arguments:
+        - name: time-match
+          arguments:
+            timezone: Asia/Shanghai
+            match(* 9-22 * * 1-5): weekday_day_
+            weekday_day_min_workers: '5'
+            match(* 9-22 * * 6-7): weekend_day_
+            weekend_day_min_workers: '1'
+        factors:
+        - name: average
+          arguments:
+            used_histories: '3'

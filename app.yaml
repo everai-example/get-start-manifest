@@ -5,6 +5,17 @@ metadata:
 spec:
   routePath: ""                                   # optional field, default same with app name
   image: quay.io/mc_jones/test-start-manifest:v0.0.3       # image for serverless app
+  imagePullSecrets:
+    username:
+      valueFrom:
+        secretKeyRef:
+          name: quay-secret
+          key: username
+    password:
+      valueFrom:
+        secretKeyRef:
+          name: quay-secret
+          key: password
   volumeMounts:
     - name: get-start-volume                                    # name
       mountPath: /workspace/volume       # mount path in container
@@ -33,6 +44,9 @@ spec:
     - name: get-start-configmap
       configMap:
         name: get-start-configmap
+    - name: quay-secret
+      secret:
+        secretName: quay-secret
 
   resource:
     cpu: 1

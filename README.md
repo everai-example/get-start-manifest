@@ -68,9 +68,7 @@ Now you can write your own Python code to implement the API endpoint service. Th
 
 ```python
 import os
-import time
 
-import flask
 from flask import Flask
 
 app = Flask(__name__)
@@ -111,6 +109,9 @@ curl http://<your ip>:8866/show-volume
 In addition, in the same application, you can implement multiple API endpoint services. This example uses `flask` to implement a external web service that sends active messages from the server to the client.  
 
 ```python
+import time
+import flask
+
 # https://everai.expvent.com/api/routes/v1/default/get-start-manifest/sse
 # http://localhost:8866/sse
 @app.route('/sse', methods=['GET'])
@@ -130,7 +131,9 @@ curl --no-buffer http://<your ip>:8866/sse
 ```
 
 ## Build image
-This step will build the container image using `Dockerfile`.    
+This step will build the container image using `Dockerfile`.  
+
+There is an example code in [Dockerfile](https://github.com/everai-example/get-start-manifest/blob/main/Dockerfile).
 
 ```
 WORKDIR /workspace

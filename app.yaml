@@ -41,9 +41,9 @@ spec:
     - name: test-start-volume                                    # volume name
       volume:
         volume: test-start-volume          # use a a private volume or a public volume from other user
-    - name: get-start-configmap
-      configMap:
-        name: get-start-configmap
+    # - name: free-worker-configmap
+    #   configMap:
+    #     name: free-worker-configmap
     - name: quay-secret
       secret:
         secretName: quay-secret
@@ -55,33 +55,39 @@ spec:
   autoscaler:
     scheduler: queue
     builtin:
-      name: simple
+      name: free-worker
       arguments:
-        max_idle_time:
-          valueFrom:
-            configMapKeyRef:
-              name: get-start-configmap
-              key: max_idle_time
-        max_queue_size:
-          valueFrom:
-            configMapKeyRef:
-              name: get-start-configmap
-              key: max_queue_size
-        max_workers:
-          valueFrom:
-            configMapKeyRef:
-              name: get-start-configmap
-              key: max_workers
-        min_workers:
-          valueFrom:
-            configMapKeyRef:
-              name: get-start-configmap
-              key: min_workers
-        scale_up_step:
-          valueFrom:
-            configMapKeyRef:
-              name: get-start-configmap
-              key: scale_up_step
+        max_idle_time: '60'                        # max idle time, default is 60
+        min_free_workers: '2'                      # min free workers, default is 2
+        max_workers: '5'                           # max workers, default is 5
+        min_workers: '1'                           # min workers, default is 1
+        scale_up_step: '2'                         # scal up step, default is 2
+      # arguments:
+      #   max_idle_time:
+      #     valueFrom:
+      #       configMapKeyRef:
+      #         name: free-worker-configmap
+      #         key: max_idle_time
+      #   min_free_workers:
+      #     valueFrom:
+      #       configMapKeyRef:
+      #         name: free-worker-configmap
+      #         key: min_free_workers
+      #   max_workers:
+      #     valueFrom:
+      #       configMapKeyRef:
+      #         name: free-worker-configmap
+      #         key: max_workers
+      #   min_workers:
+      #     valueFrom:
+      #       configMapKeyRef:
+      #         name: free-worker-configmap
+      #         key: min_workers
+      #   scale_up_step:
+      #     valueFrom:
+      #       configMapKeyRef:
+      #         name: free-worker-configmap
+      #         key: scale_up_step
       decorators:
         arguments:
         - name: time-match

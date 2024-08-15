@@ -11,7 +11,7 @@ VOLUME_TEST_NAME = 'volume-test'
 MODEL_FILE_NAME = 'my-model'
 
 
-# https://everai.expvent.com/api/routes/v1/default/get-start/txt2img
+# https://everai.expvent.com/api/routes/v1/default/get-start-manifest/txt2img
 # curl -X POST -H'Content-Type: application/json' http://localhost:8866/txt2img/jone -d '{"prompt": "say hello to"}'
 @app.route('/txt2img/<name>', methods=['POST'])
 def txt2img(name: str):
@@ -35,7 +35,7 @@ def show_volume_test():
     with open(model_path, 'r') as f:
         return f.read()
 
-# https://everai.expvent.com/api/routes/v1/default/get-start/sse
+# https://everai.expvent.com/api/routes/v1/default/get-start-manifest/sse
 # http://localhost:8866/sse
 @app.route('/sse', methods=['GET'])
 def sse():
